@@ -7,7 +7,13 @@ from scrubmeta.common import ScrubError
 from scrubmeta.pdf import clean, scan
 
 
-def make_pdf(path: Path, *, author: str = "Alex", pages: int = 2) -> None:
+def make_pdf(
+    path: Path,
+    *,
+    author: str = "Alex",
+    pages: int = 2,
+    prompt: str | None = None,
+) -> None:
     pdf = pikepdf.new()
     for _ in range(pages):
         pdf.add_blank_page(page_size=(300, 400))
@@ -19,6 +25,12 @@ def make_pdf(path: Path, *, author: str = "Alex", pages: int = 2) -> None:
         metadata["dc:title"] = "Project report"
         metadata["xmp:CreatorTool"] = "Stable Diffusion"
         metadata["xmp:Description"] = "A synthetic test file"
+        if prompt is not None:
+            metadata["xmp:Prompt"] = prompt
+            metadata["xmp:Model"] = "Generic model"
+    if prompt is not None:
+        pdf.docinfo["/Prompt"] = prompt
+        pdf.docinfo["/Model"] = "Generic model"
     pdf.save(path)
     pdf.close()
 
@@ -78,6 +90,35 @@ def test_clean_removes_selected_metadata_and_preserves_pdf_structure(
                 assert metadata.get("dc:creator") is not None
             else:
                 assert metadata.get("dc:creator") is None
+
+
+def test_ai_removes_plain_documentinfo_and_xmp_prompts_but_preserves_model(
+    tmp_path,
+):
+    source = tmp_path / "prompt.pdf"
+    output = tmp_path / "prompt-clean.pdf"
+    make_pdf(source, prompt="a red fox in snow")
+
+    fields = fields_by_name(scan(source, "ai"))
+    xmp_prompt = next(
+        field for name, field in fields.items() if name.endswith("}Prompt")
+    )
+    xmp_model = next(field for name, field in fields.items() if name.endswith("}Model"))
+    assert fields["DocumentInfo.Prompt"].disposition == "removable"
+    assert xmp_prompt.disposition == "removable"
+    assert fields["DocumentInfo.Model"].disposition == "preserved"
+    assert xmp_model.disposition == "preserved"
+
+    clean(source, output, "ai")
+
+    remaining = fields_by_name(scan(output, "ai"))
+    assert "DocumentInfo.Prompt" not in remaining
+    assert not any(name.endswith("}Prompt") for name in remaining)
+    assert remaining["DocumentInfo.Model"].value == "Generic model"
+    retained_xmp_model = next(
+        field for name, field in remaining.items() if name.endswith("}Model")
+    )
+    assert retained_xmp_model.value == "Generic model"
 
 
 def test_clean_refuses_existing_output_and_preserves_it(tmp_path):

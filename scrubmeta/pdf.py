@@ -193,7 +193,9 @@ def _removable(name: str, value: str, mode: str, *, docinfo: bool = False) -> bo
         return False
     local_name = name.rsplit("}", 1)[-1]
     if mode == "ai":
-        return targeted(f"{local_name} {value}")
+        return local_name.lstrip("/").casefold() == "prompt" or targeted(
+            f"{local_name} {value}"
+        )
     if mode == "privacy":
         return any(term in local_name.lower() for term in _PRIVACY_TERMS)
     return mode == "max"

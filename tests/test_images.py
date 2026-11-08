@@ -88,6 +88,23 @@ def test_ai_mode_removes_prompt_but_preserves_non_ai_description(
     assert "XMP-dc:Rights" in remaining
 
 
+def test_ai_mode_preserves_camera_model(tmp_path: Path) -> None:
+    source = tmp_path / "camera.jpg"
+    output = tmp_path / "camera_clean.jpg"
+    _make_image(source, "jpg")
+    _set_tags(source, "-IFD0:Model=Canon EOS R6", "-XMP-xmp:CreatorTool=GPT-6")
+
+    fields = {field.name: field for field in scan(source, "ai")}
+    assert fields["IFD0:Model"].disposition == "preserved"
+    assert fields["XMP-xmp:CreatorTool"].disposition == "removable"
+
+    clean(source, output, "ai")
+
+    remaining = {field.name: field for field in scan(output, "ai")}
+    assert remaining["IFD0:Model"].value == "Canon EOS R6"
+    assert "XMP-xmp:CreatorTool" not in remaining
+
+
 def test_max_preserves_orientation_and_rejects_mismatched_signature(
     tmp_path: Path,
 ) -> None:

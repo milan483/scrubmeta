@@ -131,6 +131,33 @@ def test_ai_clean_removes_only_recognized_ai_values_and_preserves_parts(
         assert b'xmlns:dcterms="http://purl.org/dc/terms/"' in rewritten_core
 
 
+def test_ai_removes_plain_custom_prompt_and_gpt6_but_preserves_generic_model(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "prompt.docx"
+    output = tmp_path / "prompt-clean.docx"
+    custom = (
+        f'<Properties xmlns="{CUSTOM_NS}" xmlns:vt="{VT_NS}">'
+        '<property name="Prompt" pid="2" fmtid="{D5CDD505-2E9C-101B-9397-08002B2CF9AE}"><vt:lpwstr>a red fox in snow</vt:lpwstr></property>'
+        '<property name="Workflow" pid="3" fmtid="{D5CDD505-2E9C-101B-9397-08002B2CF9AE}"><vt:lpwstr>GPT-6</vt:lpwstr></property>'
+        '<property name="Model" pid="4" fmtid="{D5CDD505-2E9C-101B-9397-08002B2CF9AE}"><vt:lpwstr>Generic model</vt:lpwstr></property>'
+        "</Properties>"
+    ).encode()
+    make_docx(source, custom_xml=custom)
+
+    fields = {field.name: field for field in scan(source, "ai")}
+    assert fields["docProps/custom.xml:custom.Prompt"].disposition == "removable"
+    assert fields["docProps/custom.xml:custom.Workflow"].disposition == "removable"
+    assert fields["docProps/custom.xml:custom.Model"].disposition == "preserved"
+
+    clean(source, output, "ai")
+
+    remaining = values(output, "ai")
+    assert "docProps/custom.xml:custom.Prompt" not in remaining
+    assert "docProps/custom.xml:custom.Workflow" not in remaining
+    assert remaining["docProps/custom.xml:custom.Model"] == "Generic model"
+
+
 def test_privacy_then_max_clean_and_idempotent(tmp_path: Path) -> None:
     source = tmp_path / "source.docx"
     privacy = tmp_path / "privacy.docx"

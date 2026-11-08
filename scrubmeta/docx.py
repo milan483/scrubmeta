@@ -251,7 +251,10 @@ def _is_removable(part: str, field_name: str, value: str, mode: str) -> bool:
     if part == _APP and field_name in _APP_ALWAYS_PRESERVE:
         return False
     if mode == "ai":
-        return targeted(value) or (part == _CUSTOM and targeted(field_name))
+        return targeted(value) or (
+            part == _CUSTOM
+            and (field_name.casefold() == "prompt" or targeted(field_name))
+        )
     if mode == "privacy":
         if part == _CORE:
             return field_name in _CORE_PRIVACY
