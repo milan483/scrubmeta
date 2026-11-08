@@ -5,7 +5,7 @@
 ## Project status
 
 - [Issue #1](https://github.com/milan483/scrubmeta/issues/1), the offline metadata CLI MVP, was merged through [PR #2](https://github.com/milan483/scrubmeta/pull/2).
-- [Issue #3](https://github.com/milan483/scrubmeta/issues/3) tracks v0.1.0 release preparation. The [release checklist](RELEASE_CHECKLIST.md) covers artifact validation, application QA, and the pending owner license decision.
+- [Issue #3](https://github.com/milan483/scrubmeta/issues/3) tracks v0.1.0 release preparation. The [release checklist](RELEASE_CHECKLIST.md) covers artifact validation, application QA, and the MIT license.
 - [Issue #4](https://github.com/milan483/scrubmeta/issues/4), safe recursive batch processing, is queued for the next implementation cycle.
 
 ## Workflow

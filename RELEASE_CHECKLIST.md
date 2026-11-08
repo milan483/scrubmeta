@@ -15,10 +15,10 @@ and its linked PR for the exact validation results.
   source tree. Run `scrubmeta --help`, then scan, clean, and verify a synthetic
   file. Check that the original bytes stay intact.
 - Confirm that the Ubuntu and Windows test matrix and the packaging job pass.
-- **Release blocker**. The owner needs to choose a license, for example MIT or
-  Apache-2.0. The repository and package currently carry no project license.
-  Tagging, publishing a release, and uploading distributions require separate
-  authorization.
+- Verify that both distributions carry the [MIT license](LICENSE) and declare
+  `License-Expression: MIT` in their metadata.
+- Obtain separate authorization before tagging, publishing a release, or
+  uploading distributions.
 
 ## Manual application QA
 
