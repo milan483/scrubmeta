@@ -10,7 +10,29 @@ Clone the repository and run the installation commands from its root. ExifTool
 is required for images. Verify that `exiftool -ver` works in the terminal you use
 to run scrubmeta.
 
-On Debian or Ubuntu:
+### Arch Linux and CachyOS
+
+Install Python and [ExifTool from Arch's Extra repository](https://archlinux.org/packages/extra/any/perl-image-exiftool/).
+Run these commands from the cloned repository.
+
+```sh
+sudo pacman -Syu --needed python perl-image-exiftool
+exiftool -ver
+python -m venv .venv
+```
+
+In Fish, activate with `source .venv/bin/activate.fish`. In Bash or Zsh, use
+`source .venv/bin/activate`. Then install into the virtual environment.
+
+```sh
+python -m pip install .
+scrubmeta --help
+```
+
+You can skip activation by running `.venv/bin/python -m pip install .` and
+`.venv/bin/scrubmeta --help`.
+
+### Debian and Ubuntu
 
 ```sh
 sudo apt install libimage-exiftool-perl
@@ -19,10 +41,13 @@ python3 -m venv .venv
 .venv/bin/scrubmeta scan "My document.docx"
 ```
 
-On Windows with PowerShell and Chocolatey:
+### Windows PowerShell
+
+With Python 3.11 or later and Chocolatey installed:
 
 ```powershell
 choco install exiftool
+exiftool -ver
 py -3 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install .
 .\.venv\Scripts\scrubmeta.exe scan "C:\Photos\Family photo.jpg"
@@ -31,6 +56,9 @@ py -3 -m venv .venv
 You can also install the [official ExifTool Windows distribution](https://exiftool.org/)
 and add its executable directory to PATH. Use the corresponding virtual
 environment's Python for `python -m scrubmeta`.
+
+See the [v0.1.0 release checklist](RELEASE_CHECKLIST.md) for packaging and
+application compatibility checks.
 
 ## Use
 
