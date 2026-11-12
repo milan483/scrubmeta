@@ -3,6 +3,8 @@
 import argparse
 import json
 from dataclasses import asdict
+from importlib.metadata import version
+from pathlib import Path
 
 from . import MODES, clean, scan, verify
 from .common import ScrubError
@@ -20,6 +22,7 @@ def main(argv: list[str] | None = None) -> int:
         prog="scrubmeta",
         description="Inspect and remove selected embedded metadata from a copy.",
     )
+    parser.add_argument("--version", action="version", version=version("scrubmeta"))
     commands = parser.add_subparsers(dest="command", required=True)
     for name, help_text in (
         ("scan", "list embedded metadata fields"),
@@ -30,6 +33,13 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("path", help="input file")
         command.add_argument("--mode", choices=MODES, default="privacy")
         command.add_argument("--json", action="store_true", help="emit a JSON result")
+        command.add_argument(
+            "--recursive", action="store_true", help="include subdirectories"
+        )
+        if name == "clean":
+            command.add_argument(
+                "--output-dir", type=Path, help="directory for cleaned files"
+            )
         if name == "scan":
             command.add_argument(
                 "--show-values",
@@ -43,6 +53,40 @@ def main(argv: list[str] | None = None) -> int:
         report["warnings"].append(_MAX)
     code = 0
     try:
+        if Path(args.path).is_dir():
+            from .batch import run_batch
+
+            batch, code = run_batch(
+                Path(args.path),
+                args.command,
+                args.mode,
+                recursive=args.recursive,
+                output_dir=getattr(args, "output_dir", None),
+                show_values=getattr(args, "show_values", False),
+            )
+            report.update(batch)
+            if args.json:
+                print(json.dumps(report, indent=2))
+            else:
+                for result in report["results"]:
+                    detail = f" ({result['error']})" if "error" in result else ""
+                    print(f"{result['path']!r}: {result['status']}{detail}")
+                    if getattr(args, "show_values", False):
+                        for field in result.get("fields", []):
+                            print(
+                                f"  {field['disposition']}: {field['name']!r}"
+                                f" = {field.get('value')!r}"
+                            )
+                print(
+                    " ".join(
+                        f"{key}={value}" for key, value in report["summary"].items()
+                    )
+                )
+                for warning in report["warnings"]:
+                    print(warning)
+            return code
+        if args.recursive or getattr(args, "output_dir", None) is not None:
+            raise ScrubError("--recursive and --output-dir require a directory input.")
         if args.command == "scan":
             fields = scan(args.path, args.mode)
             report.update(status="scanned", readable=True)

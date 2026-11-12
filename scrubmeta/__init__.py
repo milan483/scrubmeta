@@ -45,15 +45,29 @@ def verify(path: str | Path, mode: str = "privacy") -> Verification:
     return Verification(status, True, fields)
 
 
-def clean(path: str | Path, mode: str = "privacy") -> tuple[Path, Verification]:
+def supported_extensions() -> frozenset[str]:
+    """Return the file extensions supported by the format handlers."""
+    return frozenset(_HANDLERS)
+
+
+def clean(
+    path: str | Path,
+    mode: str = "privacy",
+    *,
+    destination: str | Path | None = None,
+) -> tuple[Path, Verification]:
     """Publish a validated sibling copy without replacing an existing path."""
     source = Path(path)
     handler = _handler(source, mode)
-    destination = source.with_name(f"{source.stem}_clean{source.suffix}")
+    destination = (
+        Path(destination)
+        if destination is not None
+        else source.with_name(f"{source.stem}_clean{source.suffix}")
+    )
     if os.path.lexists(destination):
         raise ScrubError("Output already exists. Move it aside before cleaning again.")
 
-    with TemporaryDirectory(prefix=".scrubmeta-", dir=source.parent) as directory:
+    with TemporaryDirectory(prefix=".scrubmeta-", dir=destination.parent) as directory:
         # Inspect and clean the same snapshot, even if the source path is replaced.
         snapshot = Path(directory) / f"input{source.suffix}"
         output = Path(directory) / f"output{source.suffix}"
