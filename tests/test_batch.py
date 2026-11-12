@@ -360,3 +360,8 @@ def test_default_output_supports_source_with_symlinked_ancestor(tmp_path: Path) 
     assert code == 0
     assert report["summary"]["cleaned"] == 1
     assert (actual / "photos_clean" / "file.pdf").is_file()
+
+
+def test_filesystem_root_clean_rejected_before_enumeration(tmp_path: Path) -> None:
+    with pytest.raises(ScrubError, match="inside, equal to, or an ancestor"):
+        batch.run_batch(Path(tmp_path.anchor), "clean")

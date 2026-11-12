@@ -202,7 +202,7 @@ def run_batch(
         output_root = (
             Path(output_dir)
             if output_dir is not None
-            else source.with_name(f"{source.name}_clean")
+            else source.parent / f"{source.name}_clean"
         )
         output_root = _absolute(output_root)
         _reject_symlink_components(output_root)
