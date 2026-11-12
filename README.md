@@ -57,7 +57,7 @@ You can also install the [official ExifTool Windows distribution](https://exifto
 and add its executable directory to PATH. Use the corresponding virtual
 environment's Python for `python -m scrubmeta`.
 
-See the [v0.1.0 release checklist](RELEASE_CHECKLIST.md) for packaging and
+See the [1.0.0 release checklist](RELEASE_CHECKLIST.md) for packaging and
 application compatibility checks.
 
 ## Use
