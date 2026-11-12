@@ -1,7 +1,7 @@
-# v0.1.0 release checklist
+# 1.0.0 release checklist
 
 The merged MVP supports offline scan, clean, and verify for DOCX, PDF, JPEG,
-PNG, and WebP. The candidate version remains `0.1.0`. See the
+PNG, and WebP. The candidate version remains `1.0.0`. See the
 [release preparation issue](https://github.com/milan483/scrubmeta/issues/3)
 and its linked PR for the exact validation results.
 

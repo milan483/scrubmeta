@@ -112,3 +112,38 @@ Undetected provenance can remain, including embedded attachments, document text,
 pixels, invisible watermarks, and metadata in unsupported containers or
 namespaces. scrubmeta provides no guarantee of anonymity or AI-detector results.
 It leaves filesystem timestamps and ACLs outside the scope of sanitization.
+
+## Directory processing in 1.0.0
+
+```sh
+scrubmeta scan "Photos"
+scrubmeta verify "Photos" --recursive --json
+scrubmeta clean "Photos" --recursive
+scrubmeta clean "Photos" --recursive --output-dir "Sanitized photos"
+scrubmeta --version
+```
+
+Directory commands inspect immediate children by default. Add `--recursive`
+to include nested folders. Cleaning writes to the sibling `Photos_clean`
+directory, retaining each original filename and relative path. An existing
+destination file becomes a per-file error. Other files continue processing.
+
+Output must be outside the input tree. Symlinks and other non-regular entries
+are skipped, and unsupported extensions are counted. Keep input and output
+trees stable while a batch is running. File failures are isolated, so a batch
+can produce some valid outputs and still return an error.
+
+Batch JSON includes `mode`, `warnings`, `status`, `results`, and `summary`.
+Results are ordered by relative path using forward slashes. Each result has
+`path` and `status`, with `fields`, `output`, or `error` where applicable.
+Field values require the explicit `scan --show-values` option.
+
+The summary counts `discovered`, `processed`, `cleaned`, `verified`,
+`skipped_unsupported`, `skipped_nonregular`, `remaining`, `unsupported`, and
+`errors`. Discovered entries include skipped entries. The verified counter counts completed checks, including files with remaining
+targets or unsupported fields. Use each result's status to interpret the check.
+
+For batch verify, exit precedence is operational errors (2), remaining known
+targets (1), unsupported or unknown metadata (3), then success (0). Scan and
+clean return 2 for operational errors and 0 otherwise. Skipped unsupported file
+extensions are reported separately from unsupported embedded metadata.
