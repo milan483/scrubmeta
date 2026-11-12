@@ -1,21 +1,16 @@
 # Codex: start here
 
-**Repository:** https://github.com/milan483/scrubmeta  
-**Current implementation specification:** [Issue #1 — MVP: offline metadata cleaner](https://github.com/milan483/scrubmeta/issues/1)
+**Repository** [milan483/scrubmeta](https://github.com/milan483/scrubmeta)
 
-## Your task
-Implement **Issue #1** in a new feature branch. Treat the issue as the canonical source for scope, acceptance criteria, technical references, and validation requirements. Follow [AGENTS.md](AGENTS.md). Do not start unrelated changes.
+## Project status
+
+- [Issue #1](https://github.com/milan483/scrubmeta/issues/1), the offline metadata CLI MVP, was merged through [PR #2](https://github.com/milan483/scrubmeta/pull/2).
+- [Issue #3](https://github.com/milan483/scrubmeta/issues/3) tracks v0.1.0 release preparation. The [release checklist](RELEASE_CHECKLIST.md) covers artifact validation, application QA, and the MIT license.
+- [Issue #4](https://github.com/milan483/scrubmeta/issues/4), safe recursive batch processing, is queued for the next implementation cycle.
 
 ## Workflow
-1. Inspect `git status`, the existing README/files, and the full issue; preserve any local changes.
-2. Implement the minimal Python CLI, format handlers, synthetic tests, and Linux/Windows GitHub Actions CI required by the issue.
-3. Validate locally and document exactly what passed, failed, or was not tested.
-4. Push your branch and open a **draft pull request** against `main` linked to Issue #1. Do not merge.
-5. Post a **separate top-level PR conversation comment** with:
-   - Summary of implemented behavior and any intentional deviations from the issue
-   - Tests, lint, and manual commands run, with actual results
-   - CI status, platform gaps, known limitations, and risks
-   - Any help needed from the reviewer
-6. Leave the PR for ChatGPT's independent review and further directions.
 
-**Short desktop instruction:** `Implement issue #1 in milan483/scrubmeta. Follow AGENTS.md and codex_start_here.md. Preserve local changes, validate, open a draft PR, and post a validation report comment. Do not merge.`
+1. Read [AGENTS.md](AGENTS.md) and the issue assigned for the current cycle. Confirm the branch and working tree before editing, and preserve local changes.
+2. Implement on a feature branch based on the relevant `main` baseline. Run the validation required by the assigned issue.
+3. Open or update the draft PR linked to the issue and post a separate validation comment with commands, results, and skipped checks.
+4. Leave merging, licensing, tags, releases, and package publication to separately authorized work.
