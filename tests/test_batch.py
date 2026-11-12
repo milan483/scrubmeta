@@ -343,3 +343,20 @@ def test_per_file_scan_failure_does_not_stop_batch(tmp_path: Path, monkeypatch) 
     assert report["results"][1]["status"] == "scanned"
     assert summary(report)["errors"] == 1
     assert summary(report)["processed"] == 2
+
+
+def test_default_output_supports_source_with_symlinked_ancestor(tmp_path: Path) -> None:
+    actual = tmp_path / "actual"
+    source = actual / "photos"
+    make_pdf(source / "file.pdf")
+    alias = tmp_path / "alias"
+    try:
+        alias.symlink_to(actual, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        pytest.skip("directory symlinks are unavailable")
+
+    report, code = batch.run_batch(alias / "photos", "clean")
+
+    assert code == 0
+    assert report["summary"]["cleaned"] == 1
+    assert (actual / "photos_clean" / "file.pdf").is_file()

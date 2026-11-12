@@ -193,7 +193,9 @@ def run_batch(
         raise ScrubError("Batch source directory must not be a symlink.")
     if not stat.S_ISDIR(source_info.st_mode):
         raise ScrubError("Batch source must be an existing directory.")
-    source = _absolute(source)
+    # Resolve the selected directory's ancestors once, so ordinary user path
+    # aliases do not become symlink components in the default output path.
+    source = _resolved(_absolute(source))
 
     output_root: Path | None = None
     if command == "clean":
